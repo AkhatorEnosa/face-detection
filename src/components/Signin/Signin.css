@@ -1,0 +1,15 @@
+.text {
+	outline: none;
+	border: none;
+	border-radius: 2px;
+	padding: 10px;
+}
+
+.detect {
+	outline: none;
+	border: none;
+	border-radius: 2px;
+	color: white;
+	background: rgb(186, 3, 3);
+	cursor: pointer;
+}

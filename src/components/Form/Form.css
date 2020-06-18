@@ -1,0 +1,28 @@
+.form {
+	background:
+	linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px,
+	linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px,
+	linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px,
+	linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px,
+	linear-gradient(90deg, #1b1b1b 10px, transparent 10px),
+	linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424);
+	background-color: #131313;
+	background-size: 20px 20px;ground-size: 13px, 29px, 37px, 53px;
+}
+
+.text {
+	outline: none;
+	border: none;
+	border-radius: 2px;
+	padding: 10px;
+	margin-right: 5px;
+}
+
+.detect {
+	outline: none;
+	border: none;
+	border-radius: 2px;
+	color: white;
+	background: rgb(186, 3, 3);
+	cursor: pointer;
+}
