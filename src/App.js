@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Clarifai from 'clarifai';
 import Particles from 'react-particles-js';
 import Navigation from './components/Navigation/Navigation';
 import Register from './components/Register/Register';
@@ -29,24 +28,42 @@ const particleOptions = {
       }
 }
 
-const app = new Clarifai.App({
- apiKey: '24a488c715dc4f319a7465a0314a6dbc'
-});
+const initialState = {
+      input : '',
+      imageUrl: '',
+      box: {},
+      route: 'signin',
+      user : {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
+    }
 
 class App extends Component { 
   constructor(){
     super()
 
-    this.state = {
-      input : '',
-      imageUrl: '',
-      box: {},
-      route: 'signin'
-    }
+    this.state = initialState
+
   }
 
   onInputChange = (event) => {
     this.setState({ input: event.target.value })
+  }
+
+  loadUser = (data) => {
+    this.setState({
+      user : {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+      }
+    })
   }
 
   calculateFacePosition = (data) => {
@@ -69,18 +86,46 @@ class App extends Component {
     this.setState({ box: box });
   }
 
-  onSubmit = () => {
+  onPictureSubmit = () => {
     this.setState({ imageUrl: this.state.input });
 
-    app.models
-      .predict(
-        Clarifai.FACE_DETECT_MODEL, 
-        this.state.input)
-      .then(response =>  this.displayFacebox(this.calculateFacePosition(response)))
-      .catch(err => console.log(err));
+      fetch('http://localhost:3000/imageUrl', {
+        method: 'post',
+        headers: {
+          'Content-Type' : 'application/json'
+        },
+        body : JSON.stringify({
+          input: this.state.input
+        })
+      })
+      .then(response => response.json())
+        .then(response =>  {
+          if(response) {
+            fetch('http://localhost:3000/image', {
+              method: 'put',
+              headers: {
+                'Content-Type' : 'application/json'
+              },
+              body : JSON.stringify({
+                id: this.state.user.id
+              })
+            })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+            .catch(console.log)
+          }
+          this.displayFacebox(this.calculateFacePosition(response))
+        })
+        .catch(err => console.log(err));
   }
 
   onRouteChange = (route) => {
+    if(route === 'signout') {
+      this.setState(initialState)
+    }
+
       this.setState({ route: route})
   }
 
@@ -93,16 +138,23 @@ class App extends Component {
             ? <React.Fragment> 
                 <Navigation  onRouteChange = {this.onRouteChange}/>
                 <Logo />
-                <Rank />
+                <Rank 
+                  name = {this.state.user.name}  
+                  entries = {this.state.user.entries}/>
                 <Form 
                   onInputChange = {this.onInputChange}
-                  onSubmit = {this.onSubmit}
+                  onPictureSubmit = {this.onPictureSubmit}
                 />
                 <Image box= {box} imageUrl = {this.state.imageUrl}/>
               </React.Fragment>
+
               : route === 'signin' ?
-                <Signin onRouteChange = {this.onRouteChange}/> :
-                <Register onRouteChange = {this.onRouteChange}/>
+                <Signin 
+                  loadUser = {this.loadUser}
+                  onRouteChange = {this.onRouteChange}/> :
+                <Register 
+                  loadUser = {this.loadUser}
+                  onRouteChange = {this.onRouteChange}/>
             
         }
         </div>
